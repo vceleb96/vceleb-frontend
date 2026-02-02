@@ -1,0 +1,17 @@
+export default function Profile() {
+  return (
+    <div className="p-6">
+      <img src="/celeb.jpg" className="w-96 rounded" />
+      <h2 className="text-2xl font-bold mt-4">Celebrity Name</h2>
+      <p>Category: Actor</p>
+      <p>Booking Fee: On Request</p>
+
+      <a
+        href="https://wa.me/918146804405"
+        className="inline-block bg-green-500 text-white px-6 py-2 mt-4 rounded"
+      >
+        Book on WhatsApp
+      </a>
+    </div>
+  );
+}

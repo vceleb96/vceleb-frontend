@@ -1,0 +1,9 @@
+import CelebrityCard from "../components/CelebrityCard";
+
+export default function Home() {
+  return (
+    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CelebrityCard name="Celebrity Name" image="/celeb.jpg" />
+    </div>
+  );
+}

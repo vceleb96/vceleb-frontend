@@ -1,0 +1,12 @@
+export default function Booking() {
+  return (
+    <form className="p-6 max-w-lg mx-auto">
+      <input className="border p-2 w-full mb-3" placeholder="Name" />
+      <input className="border p-2 w-full mb-3" placeholder="Phone" />
+      <textarea className="border p-2 w-full mb-3" placeholder="Event Details" />
+      <button className="bg-black text-white px-4 py-2">
+        Submit Enquiry
+      </button>
+    </form>
+  );
+}
