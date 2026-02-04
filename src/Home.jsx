@@ -1,19 +1,41 @@
 import { useEffect, useState } from "react";
-import api from "../api";
-import CelebrityCard from "../components/CelebrityCard";
+import api from "./api";
+import BookingForm from "./BookingForm";
 
-export default function Home() {
+
+function Home() {
   const [celebs, setCelebs] = useState([]);
 
   useEffect(() => {
-    api.get("/celebrities").then(res => setCelebs(res.data));
+    api.get("/api/celebrities")
+      .then(res => setCelebs(res.data))
+      .catch(err => console.error(err));
   }, []);
 
   return (
-    <div className="grid md:grid-cols-3 gap-6 p-6">
+    <div>
+      <h1>Available Celebrities</h1>
+
+      {celebs.length === 0 && <p>No celebrities available</p>}
+      <h2>Total celebs: {celebs.length}</h2>
+
       {celebs.map(c => (
-        <CelebrityCard key={c._id} name={c.name} image={c.image} />
+        <div
+          key={c._id}
+          style={{
+            border: "1px solid #ccc",
+            padding: 10,
+            marginBottom: 10
+          }}
+        >
+          <h3>{c.name}</h3>
+          <p>Category: {c.category}</p>
+          <p>Price: ₹{c.price}</p>
+          <BookingForm celebrity={c.name} />
+        </div>
       ))}
     </div>
   );
 }
+
+export default Home;
