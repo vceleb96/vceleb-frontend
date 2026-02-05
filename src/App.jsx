@@ -1,37 +1,21 @@
-import { useState, useEffect } from "react";
-import Login from "./Login";
-import Admin from "./Admin";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./Home";
+import Login from "./Login";
+import AdminCelebs from "./AdminCelebs";
+import AdminBookings from "./AdminBookings";
 
-function App() {
-  const [logged, setLogged] = useState(false);
+const isLoggedIn = () => !!localStorage.getItem("token");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) setLogged(true);
-  }, []);
+const Private = ({ children }) =>
+  isLoggedIn() ? children : <Navigate to="/admin/login" />;
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setLogged(false);
-  };
-
+export default function App() {
   return (
-    <div style={{ padding: 40 }}>
-      <Home />
-
-      <hr />
-
-      {logged ? (
-        <>
-          <button onClick={logout}>Logout</button>
-          <Admin />
-        </>
-      ) : (
-        <Login onLogin={() => setLogged(true)} />
-      )}
-    </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/admin/login" element={<Login />} />
+      <Route path="/admin/celebs" element={<Private><AdminCelebs /></Private>} />
+      <Route path="/admin/bookings" element={<Private><AdminBookings /></Private>} />
+    </Routes>
   );
 }
-
-export default App;
