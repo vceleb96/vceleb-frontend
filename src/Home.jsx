@@ -8,6 +8,12 @@ export default function Home() {
   useEffect(() => {
     api.get("/api/celebrities").then(res => setCelebs(res.data));
   }, []);
+<div style={{ textAlign: "right", marginBottom: 20 }}>
+  <a href="/admin/login">
+    <button>Admin Login</button>
+  </a>
+</div>
+
 
   return (
     <div className="container">

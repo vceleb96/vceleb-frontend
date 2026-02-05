@@ -1,33 +1,55 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import api from "./api";
+import AdminLayout from "./AdminLayout";
 
 function AdminBookings() {
   const [bookings, setBookings] = useState([]);
 
+  // 🔐 Protect route
+  if (!localStorage.getItem("token")) {
+    window.location.href = "/admin/login";
+    return null;
+  }
+
   useEffect(() => {
-    api.get("/api/bookings").then(res => setBookings(res.data));
+    fetchBookings();
   }, []);
 
-  return (
-    <div className="container">
-      <h2>Admin – Bookings</h2>
+  const fetchBookings = async () => {
+    const res = await api.get("/api/bookings");
+    setBookings(res.data);
+  };
 
-      <div style={{ marginBottom: 20 }}>
-        <Link to="/admin/celebs">⭐ Manage Celebrities</Link>
-      </div>
+  return (
+    <AdminLayout>
+      <h2>Bookings</h2>
 
       {bookings.length === 0 && <p>No bookings yet</p>}
 
       {bookings.map(b => (
-        <div className="card" key={b._id}>
-          <p><b>{b.celebrity}</b></p>
-          <p>{b.name} — {b.email}</p>
-          {b.message && <p>{b.message}</p>}
-          <p style={{ fontSize: 12 }}>{new Date(b.createdAt).toLocaleString()}</p>
+        <div
+          key={b._id}
+          style={{
+            border: "1px solid #ccc",
+            padding: 10,
+            marginBottom: 10
+          }}
+        >
+          <p>
+            <strong>Name:</strong> {b.name}
+          </p>
+          <p>
+            <strong>Email:</strong> {b.email}
+          </p>
+          <p>
+            <strong>Celebrity:</strong> {b.celebrity}
+          </p>
+          <p>
+            <strong>Message:</strong> {b.message}
+          </p>
         </div>
       ))}
-    </div>
+    </AdminLayout>
   );
 }
 
