@@ -8,19 +8,20 @@ export default function Home() {
   const [celebs, setCelebs] = useState([]);
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
+  const [activeBooking, setActiveBooking] = useState(null);
 
   useEffect(() => {
     api.get("/api/celebrities").then(res => setCelebs(res.data));
   }, []);
 
   const filtered = celebs.filter(c => {
-    const matchesCategory =
+    const matchCategory =
       category === "all" || c.category === category;
-    const matchesSearch = c.name
+    const matchSearch = c.name
       .toLowerCase()
       .includes(search.toLowerCase());
 
-    return matchesCategory && matchesSearch;
+    return matchCategory && matchSearch;
   });
 
   return (
@@ -54,12 +55,22 @@ export default function Home() {
         ))}
       </select>
 
+      {/* CELEBRITY LIST */}
       {filtered.map(c => (
         <div className="card" key={c._id}>
           <img src={c.image} alt={c.name} />
           <h3>{c.name}</h3>
           <p>{c.category}</p>
-          <BookingForm celebrity={c.name} />
+
+          {activeBooking === c._id ? (
+            <BookingForm celebrity={c.name} />
+          ) : (
+            <button
+              onClick={() => setActiveBooking(c._id)}
+            >
+              Book Now
+            </button>
+          )}
         </div>
       ))}
     </div>

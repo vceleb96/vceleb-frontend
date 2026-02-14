@@ -1,65 +1,77 @@
 import { useState } from "react";
 import api from "./api";
 
-function BookingForm({ celebrity, close }) {
+function BookingForm({ celebrity }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const submit = async () => {
-    // 🔴 HARD VALIDATION
-    if (!name.trim() || !email.trim()) {
-      setError("Name and Email are required");
+    if (loading || submitted) return;
+
+    if (!name || !email) {
+      alert("Name and email are required");
       return;
     }
 
     try {
+      setLoading(true);
+
       await api.post("/api/bookings", {
         name,
         email,
-        message,
-        celebrity
+        celebrity,
+        message
       });
 
-      alert("Booking submitted successfully");
-
-      setName("");
-      setEmail("");
-      setMessage("");
-      setError("");
-
-      if (close) close();
+      setSubmitted(true);
+      alert("✅ Booking submitted successfully");
     } catch (err) {
-      setError("Failed to submit booking");
+      alert("❌ Booking failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h3>Book {celebrity}</h3>
+    <div style={{ marginTop: 10 }}>
+      {submitted ? (
+        <p style={{ color: "green" }}>
+          Booking submitted ✔
+        </p>
+      ) : (
+        <>
+          <input
+            placeholder="Your Name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            disabled={loading}
+          />
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+          <input
+            placeholder="Your Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            disabled={loading}
+          />
 
-      <input
-        placeholder="Your Name"
-        value={name}
-        onChange={e => setName(e.target.value)}
-      />
+          <textarea
+            placeholder="Message (optional)"
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            disabled={loading}
+          />
 
-      <input
-        placeholder="Your Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-      />
-
-      <textarea
-        placeholder="Message (optional)"
-        value={message}
-        onChange={e => setMessage(e.target.value)}
-      />
-
-      <button onClick={submit}>Submit Booking</button>
+          <button
+            onClick={submit}
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit Booking"}
+          </button>
+        </>
+      )}
     </div>
   );
 }
