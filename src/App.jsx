@@ -22,7 +22,7 @@ export default function App() {
           </PrivateRoute>
         }
       >
-        <Route index element={<Navigate to="dashboard" />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="celebs" element={<AdminCelebs />} />
         <Route path="bookings" element={<AdminBookings />} />
