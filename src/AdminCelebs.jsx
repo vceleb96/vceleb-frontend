@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "./api";
+import CATEGORIES from "./constants/categories";
 
 const BACKEND_URL = "https://vceleb-backend.onrender.com";
 
 function AdminCelebs() {
   const [celebs, setCelebs] = useState([]);
   const [sortBy, setSortBy] = useState("name");
+  const [form, setForm] = useState({
+    name: "",
+    category: "Bollywood",
+    price: "",
+    image: ""
+  });
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetchCelebs();
@@ -16,8 +24,33 @@ function AdminCelebs() {
     setCelebs(res.data);
   };
 
-  const resolveImage = img =>
-    img?.startsWith("http") ? img : `${BACKEND_URL}${img}`;
+  const submit = async () => {
+    if (editingId) {
+      await api.put(`/api/celebrities/${editingId}`, form);
+    } else {
+      await api.post("/api/celebrities", form);
+    }
+
+    setForm({
+      name: "",
+      category: "Bollywood",
+      price: "",
+      image: ""
+    });
+    setEditingId(null);
+    fetchCelebs();
+  };
+
+  const edit = c => {
+    setEditingId(c._id);
+    setForm(c);
+  };
+
+  const del = async id => {
+    if (!window.confirm("Delete celebrity?")) return;
+    await api.delete(`/api/celebrities/${id}`);
+    fetchCelebs();
+  };
 
   const sorted = [...celebs].sort((a, b) => {
     if (sortBy === "price-low") return a.price - b.price;
@@ -29,7 +62,7 @@ function AdminCelebs() {
 
   return (
     <div>
-      <h3>Admin – Celebrities</h3>
+      <h3>Manage Celebrities</h3>
 
       <label>Sort by: </label>
       <select
@@ -44,13 +77,64 @@ function AdminCelebs() {
 
       <hr />
 
+      {/* ADD / EDIT FORM */}
+      <input
+        placeholder="Name"
+        value={form.name}
+        onChange={e =>
+          setForm({ ...form, name: e.target.value })
+        }
+      />
+
+      <select
+        value={form.category}
+        onChange={e =>
+          setForm({ ...form, category: e.target.value })
+        }
+      >
+        {CATEGORIES.map(cat => (
+          <option key={cat} value={cat}>
+            {cat}
+          </option>
+        ))}
+      </select>
+
+      <input
+        placeholder="Price"
+        value={form.price}
+        onChange={e =>
+          setForm({ ...form, price: e.target.value })
+        }
+      />
+
+      <input
+        placeholder="Image URL"
+        value={form.image}
+        onChange={e =>
+          setForm({ ...form, image: e.target.value })
+        }
+      />
+
+      <button onClick={submit}>
+        {editingId ? "Update" : "Add"}
+      </button>
+
+      <hr />
+
       {sorted.map(c => (
         <div key={c._id} style={{ display: "flex", gap: 10 }}>
-          <img src={resolveImage(c.image)} width="80" />
+          <img src={c.image} width="80" />
           <div>
             <h4>{c.name}</h4>
             <p>{c.category}</p>
             <p>₹{c.price}</p>
+            <button onClick={() => edit(c)}>Edit</button>
+            <button
+              onClick={() => del(c._id)}
+              style={{ color: "red" }}
+            >
+              Delete
+            </button>
           </div>
         </div>
       ))}

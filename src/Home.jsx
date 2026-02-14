@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "./api";
 import BookingForm from "./BookingForm";
+import CATEGORIES from "./constants/categories";
 
 export default function Home() {
   const [celebs, setCelebs] = useState([]);
@@ -12,11 +13,6 @@ export default function Home() {
       setCelebs(res.data);
     });
   }, []);
-
-  const categories = [
-    "all",
-    ...new Set(celebs.map(c => c.category))
-  ];
 
   const filtered =
     category === "all"
@@ -39,7 +35,8 @@ export default function Home() {
           value={category}
           onChange={e => setCategory(e.target.value)}
         >
-          {categories.map(cat => (
+          <option value="all">ALL</option>
+          {CATEGORIES.map(cat => (
             <option key={cat} value={cat}>
               {cat.toUpperCase()}
             </option>
@@ -52,9 +49,6 @@ export default function Home() {
           <img src={c.image} alt={c.name} />
           <h3>{c.name}</h3>
           <p>{c.category}</p>
-
-          {/* ❌ price not even received from API */}
-
           <BookingForm celebrity={c.name} />
         </div>
       ))}
