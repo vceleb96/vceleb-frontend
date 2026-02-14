@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "./api";
 
 function Login() {
@@ -6,6 +7,8 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const login = async () => {
     setError("");
@@ -24,11 +27,11 @@ function Login() {
       });
 
       localStorage.setItem("token", res.data.token);
-      window.location.href = "/admin/dashboard";
+
+      // ✅ FIXED: SPA navigation (HashRouter-safe)
+      navigate("/admin/dashboard");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Invalid login"
-      );
+      setError(err.response?.data?.message || "Invalid login");
     } finally {
       setLoading(false);
     }
