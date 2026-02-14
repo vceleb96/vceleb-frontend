@@ -32,9 +32,9 @@ function Login() {
       // redirect to admin dashboard
       navigate("/admin");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Invalid email or password"
-      );
+  console.log("LOGIN ERROR:", err.response?.data);
+  setError(err.response?.data?.message || "Login failed");
+}
     } finally {
       setLoading(false);
     }

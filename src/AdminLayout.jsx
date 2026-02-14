@@ -3,25 +3,22 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 export default function AdminLayout() {
   const navigate = useNavigate();
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
-
   return (
     <div style={{ padding: 30 }}>
       <h2>Admin Panel</h2>
 
-      <nav style={{ marginBottom: 20 }}>
+      <nav>
+        <Link to="/admin/dashboard">Dashboard</Link>{" | "}
         <Link to="/admin/celebs">Celebrities</Link>{" | "}
         <Link to="/admin/bookings">Bookings</Link>{" | "}
         <Link to="/admin/change-password">Change Password</Link>{" | "}
-        <button onClick={logout}>Logout</button>
+        <button onClick={() => {
+          localStorage.removeItem("token");
+          navigate("/");
+        }}>Logout</button>
       </nav>
 
       <hr />
-
-      {/* CHILD ROUTES RENDER HERE */}
       <Outlet />
     </div>
   );

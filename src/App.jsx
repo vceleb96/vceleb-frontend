@@ -4,17 +4,16 @@ import Login from "./Login";
 import AdminLayout from "./AdminLayout";
 import AdminCelebs from "./AdminCelebs";
 import AdminBookings from "./AdminBookings";
+import AdminDashboard from "./AdminDashboard";
 import AdminChangePassword from "./AdminChangePassword";
 import PrivateRoute from "./PrivateRoute";
 
 export default function App() {
   return (
     <Routes>
-      {/* PUBLIC */}
       <Route path="/" element={<Home />} />
       <Route path="/admin/login" element={<Login />} />
 
-      {/* ADMIN */}
       <Route
         path="/admin"
         element={
@@ -23,7 +22,8 @@ export default function App() {
           </PrivateRoute>
         }
       >
-        <Route index element={<Navigate to="celebs" replace />} />
+        <Route index element={<Navigate to="dashboard" />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="celebs" element={<AdminCelebs />} />
         <Route path="bookings" element={<AdminBookings />} />
         <Route path="change-password" element={<AdminChangePassword />} />
