@@ -39,10 +39,10 @@ function AdminCelebs() {
   const startEdit = celeb => {
     setEditingId(celeb._id);
     setForm({
-      name: celeb.name,
-      category: celeb.category,
-      price: celeb.price,
-      image: celeb.image
+      name: celeb.name || "",
+      category: celeb.category || "",
+      price: celeb.price || "",
+      image: celeb.image || ""
     });
   };
 
@@ -91,12 +91,14 @@ function AdminCelebs() {
       });
 
       setCelebs(prev => prev.filter(c => c._id !== id));
-    } catch {
+    } catch (err) {
       alert("Delete failed");
     }
   };
 
-  if (loading) return <p>Loading celebrities...</p>;
+  if (loading) {
+    return <p>Loading celebrities...</p>;
+  }
 
   return (
     <div>
@@ -133,3 +135,64 @@ function AdminCelebs() {
                   value={form.name}
                   onChange={e =>
                     setForm({ ...form, name: e.target.value })
+                  }
+                />
+
+                <input
+                  placeholder="Category"
+                  value={form.category}
+                  onChange={e =>
+                    setForm({ ...form, category: e.target.value })
+                  }
+                />
+
+                <input
+                  placeholder="Price"
+                  value={form.price}
+                  onChange={e =>
+                    setForm({ ...form, price: e.target.value })
+                  }
+                />
+
+                <input
+                  placeholder="Image URL"
+                  value={form.image}
+                  onChange={e =>
+                    setForm({ ...form, image: e.target.value })
+                  }
+                />
+
+                <button onClick={() => saveEdit(c._id)}>
+                  Save
+                </button>
+
+                <button onClick={cancelEdit}>
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <h4>{c.name}</h4>
+                <p>{c.category}</p>
+                <p>₹{c.price}</p>
+
+                <button onClick={() => startEdit(c)}>
+                  Edit
+                </button>
+
+                <button
+                  onClick={() => deleteCeleb(c._id)}
+                  style={{ color: "red", marginLeft: 10 }}
+                >
+                  Delete
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default AdminCelebs;
