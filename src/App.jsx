@@ -11,9 +11,11 @@ import PrivateRoute from "./PrivateRoute";
 export default function App() {
   return (
     <Routes>
+      {/* PUBLIC */}
       <Route path="/" element={<Home />} />
       <Route path="/admin/login" element={<Login />} />
 
+      {/* ADMIN */}
       <Route
         path="/admin"
         element={
@@ -28,6 +30,9 @@ export default function App() {
         <Route path="bookings" element={<AdminBookings />} />
         <Route path="change-password" element={<AdminChangePassword />} />
       </Route>
+
+      {/* FALLBACK */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

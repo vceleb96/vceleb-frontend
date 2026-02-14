@@ -10,14 +10,13 @@ export default function AdminLayout() {
 
   return (
     <div style={{ padding: 16, maxWidth: 1200, margin: "auto" }}>
-      <h2 style={{ marginBottom: 10 }}>Admin Panel</h2>
+      <h2>Admin Panel</h2>
 
-      {/* Responsive Nav */}
       <nav
         style={{
           display: "flex",
           flexWrap: "wrap",
-          gap: 10,
+          gap: 12,
           marginBottom: 20
         }}
       >

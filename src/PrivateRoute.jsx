@@ -3,8 +3,7 @@ import { Navigate } from "react-router-dom";
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
 
-  // While browser is restoring state, don't crash
-  if (token === null) {
+  if (!token) {
     return <Navigate to="/admin/login" replace />;
   }
 
