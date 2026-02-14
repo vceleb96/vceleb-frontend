@@ -1,28 +1,32 @@
 import { useEffect, useState } from "react";
 import api from "./api";
-import AdminLayout from "./AdminLayout";
 
 function AdminBookings() {
   const [bookings, setBookings] = useState([]);
-
-  // 🔐 Protect route
-  if (!localStorage.getItem("token")) {
-    window.location.href = "/admin/login";
-    return null;
-  }
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchBookings();
   }, []);
 
   const fetchBookings = async () => {
-    const res = await api.get("/api/bookings");
-    setBookings(res.data);
+    try {
+      const res = await api.get("/api/bookings");
+      setBookings(res.data);
+    } catch (err) {
+      console.error("Failed to fetch bookings", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  if (loading) {
+    return <p>Loading bookings...</p>;
+  }
+
   return (
-    <AdminLayout>
-      <h2>Bookings</h2>
+    <div>
+      <h3>Bookings</h3>
 
       {bookings.length === 0 && <p>No bookings yet</p>}
 
@@ -49,7 +53,7 @@ function AdminBookings() {
           </p>
         </div>
       ))}
-    </AdminLayout>
+    </div>
   );
 }
 
