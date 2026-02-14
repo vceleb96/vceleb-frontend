@@ -15,9 +15,13 @@ export default function AdminLayout() {
       <nav style={{ marginBottom: 20 }}>
         <Link to="/admin/celebs">Celebrities</Link>{" | "}
         <Link to="/admin/bookings">Bookings</Link>{" | "}
+        <Link to="/admin/change-password">Change Password</Link>{" | "}
         <button onClick={logout}>Logout</button>
       </nav>
 
+      <hr />
+
+      {/* CHILD ROUTES RENDER HERE */}
       <Outlet />
     </div>
   );
