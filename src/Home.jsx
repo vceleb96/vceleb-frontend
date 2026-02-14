@@ -8,20 +8,18 @@ export default function Home() {
   const [celebs, setCelebs] = useState([]);
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
-  const [activeBooking, setActiveBooking] = useState(null);
+  const [activeCeleb, setActiveCeleb] = useState(null);
 
   useEffect(() => {
     api.get("/api/celebrities").then(res => setCelebs(res.data));
   }, []);
 
   const filtered = celebs.filter(c => {
-    const matchCategory =
-      category === "all" || c.category === category;
-    const matchSearch = c.name
+    const catOk = category === "all" || c.category === category;
+    const searchOk = c.name
       .toLowerCase()
       .includes(search.toLowerCase());
-
-    return matchCategory && matchSearch;
+    return catOk && searchOk;
   });
 
   return (
@@ -34,7 +32,6 @@ export default function Home() {
 
       <h1>Available Celebrities</h1>
 
-      {/* SEARCH */}
       <input
         placeholder="Search celebrity"
         value={search}
@@ -42,7 +39,6 @@ export default function Home() {
         style={{ marginBottom: 10 }}
       />
 
-      {/* CATEGORY FILTER */}
       <select
         value={category}
         onChange={e => setCategory(e.target.value)}
@@ -55,24 +51,25 @@ export default function Home() {
         ))}
       </select>
 
-      {/* CELEBRITY LIST */}
       {filtered.map(c => (
         <div className="card" key={c._id}>
           <img src={c.image} alt={c.name} />
           <h3>{c.name}</h3>
           <p>{c.category}</p>
 
-          {activeBooking === c._id ? (
-            <BookingForm celebrity={c.name} />
-          ) : (
-            <button
-              onClick={() => setActiveBooking(c._id)}
-            >
-              Book Now
-            </button>
-          )}
+          <button onClick={() => setActiveCeleb(c)}>
+            Book Now
+          </button>
         </div>
       ))}
+
+      {/* MODAL */}
+      {activeCeleb && (
+        <BookingForm
+          celebrity={activeCeleb.name}
+          onClose={() => setActiveCeleb(null)}
+        />
+      )}
     </div>
   );
 }
