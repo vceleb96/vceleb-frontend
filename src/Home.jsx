@@ -13,21 +13,18 @@ export default function Home() {
     });
   }, []);
 
-  // 🗂️ UNIQUE CATEGORIES
   const categories = [
     "all",
     ...new Set(celebs.map(c => c.category))
   ];
 
-  // 🔽 CATEGORY SORT / FILTER (PUBLIC)
-  const filteredCelebs =
+  const filtered =
     category === "all"
       ? celebs
       : celebs.filter(c => c.category === category);
 
   return (
     <div className="container">
-      {/* ADMIN LOGIN */}
       <div style={{ textAlign: "right", marginBottom: 20 }}>
         <Link to="/admin/login">
           <button>Admin Login</button>
@@ -36,12 +33,8 @@ export default function Home() {
 
       <h1>Available Celebrities</h1>
 
-      {/* CATEGORY SORT */}
       <div style={{ marginBottom: 20 }}>
-        <label style={{ marginRight: 10 }}>
-          Sort by category:
-        </label>
-
+        <label>Filter by category: </label>
         <select
           value={category}
           onChange={e => setCategory(e.target.value)}
@@ -54,16 +47,13 @@ export default function Home() {
         </select>
       </div>
 
-      {/* CELEBRITY LIST */}
-      {filteredCelebs.map(c => (
+      {filtered.map(c => (
         <div className="card" key={c._id}>
           <img src={c.image} alt={c.name} />
-
           <h3>{c.name}</h3>
-
           <p>{c.category}</p>
 
-          {/* ❌ PRICE HIDDEN FROM PUBLIC */}
+          {/* ❌ price not even received from API */}
 
           <BookingForm celebrity={c.name} />
         </div>
