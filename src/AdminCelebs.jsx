@@ -5,6 +5,7 @@ const BACKEND_URL = "https://vceleb-backend.onrender.com";
 
 function AdminCelebs() {
   const [celebs, setCelebs] = useState([]);
+  const [sortBy, setSortBy] = useState("name");
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -28,15 +29,28 @@ function AdminCelebs() {
     return `${BACKEND_URL}${img.startsWith("/") ? img : "/" + img}`;
   };
 
+  // 🔽 ADMIN SORT
+  const sortedCelebs = [...celebs].sort((a, b) => {
+    if (sortBy === "name") {
+      return a.name.localeCompare(b.name);
+    }
+    if (sortBy === "price-low") {
+      return a.price - b.price;
+    }
+    if (sortBy === "price-high") {
+      return b.price - a.price;
+    }
+    if (sortBy === "category") {
+      return a.category.localeCompare(b.category);
+    }
+    return 0;
+  });
+
   const submit = async () => {
     if (editingId) {
-      await api.put(`/api/celebrities/${editingId}`, form, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
+      await api.put(`/api/celebrities/${editingId}`, form);
     } else {
-      await api.post("/api/celebrities", form, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
+      await api.post("/api/celebrities", form);
     }
 
     setForm({ name: "", category: "", price: "", image: "" });
@@ -50,9 +64,8 @@ function AdminCelebs() {
   };
 
   const del = async id => {
-    await api.delete(`/api/celebrities/${id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
+    if (!window.confirm("Delete celebrity?")) return;
+    await api.delete(`/api/celebrities/${id}`);
     fetchCelebs();
   };
 
@@ -60,17 +73,52 @@ function AdminCelebs() {
     <div>
       <h3>Manage Celebrities</h3>
 
-      <input placeholder="Name" value={form.name}
-        onChange={e => setForm({ ...form, name: e.target.value })} />
+      {/* ADMIN SORT OPTIONS */}
+      <div style={{ marginBottom: 15 }}>
+        <label style={{ marginRight: 10 }}>Sort by:</label>
+        <select
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value)}
+        >
+          <option value="name">Name</option>
+          <option value="category">Category</option>
+          <option value="price-low">Price (Low → High)</option>
+          <option value="price-high">Price (High → Low)</option>
+        </select>
+      </div>
 
-      <input placeholder="Category" value={form.category}
-        onChange={e => setForm({ ...form, category: e.target.value })} />
+      {/* ADD / EDIT FORM */}
+      <input
+        placeholder="Name"
+        value={form.name}
+        onChange={e =>
+          setForm({ ...form, name: e.target.value })
+        }
+      />
 
-      <input placeholder="Price" value={form.price}
-        onChange={e => setForm({ ...form, price: e.target.value })} />
+      <input
+        placeholder="Category"
+        value={form.category}
+        onChange={e =>
+          setForm({ ...form, category: e.target.value })
+        }
+      />
 
-      <input placeholder="Image URL" value={form.image}
-        onChange={e => setForm({ ...form, image: e.target.value })} />
+      <input
+        placeholder="Price"
+        value={form.price}
+        onChange={e =>
+          setForm({ ...form, price: e.target.value })
+        }
+      />
+
+      <input
+        placeholder="Image URL"
+        value={form.image}
+        onChange={e =>
+          setForm({ ...form, image: e.target.value })
+        }
+      />
 
       <button onClick={submit}>
         {editingId ? "Update" : "Add"}
@@ -78,14 +126,20 @@ function AdminCelebs() {
 
       <hr />
 
-      {celebs.map(c => (
+      {/* CELEB LIST */}
+      {sortedCelebs.map(c => (
         <div key={c._id} style={{ display: "flex", gap: 10 }}>
           <img src={resolveImage(c.image)} width="80" />
           <div>
             <h4>{c.name}</h4>
-            <p>{c.category} — ₹{c.price}</p>
+            <p>{c.category}</p>
+            <p>₹{c.price}</p>
+
             <button onClick={() => edit(c)}>Edit</button>
-            <button onClick={() => del(c._id)} style={{ color: "red" }}>
+            <button
+              onClick={() => del(c._id)}
+              style={{ color: "red" }}
+            >
               Delete
             </button>
           </div>
