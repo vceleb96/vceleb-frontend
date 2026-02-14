@@ -7,13 +7,15 @@ const BACKEND_URL = "https://vceleb-backend.onrender.com";
 function AdminCelebs() {
   const [celebs, setCelebs] = useState([]);
   const [sortBy, setSortBy] = useState("name");
+  const [editingId, setEditingId] = useState(null);
+  const [error, setError] = useState("");
+
   const [form, setForm] = useState({
     name: "",
     category: "Bollywood",
     price: "",
     image: ""
   });
-  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetchCelebs();
@@ -24,32 +26,82 @@ function AdminCelebs() {
     setCelebs(res.data);
   };
 
+  const resolveImage = img => {
+    if (!img) return "https://via.placeholder.com/80";
+    if (img.startsWith("http")) return img;
+    return `${BACKEND_URL}${img}`;
+  };
+
   const submit = async () => {
-    if (editingId) {
-      await api.put(`/api/celebrities/${editingId}`, form);
-    } else {
-      await api.post("/api/celebrities", form);
+    setError("");
+
+    if (!form.name || !form.category || !form.price || !form.image) {
+      setError("All fields are required");
+      return;
     }
 
-    setForm({
-      name: "",
-      category: "Bollywood",
-      price: "",
-      image: ""
-    });
-    setEditingId(null);
-    fetchCelebs();
+    try {
+      if (editingId) {
+        await api.put(
+          `/api/celebrities/${editingId}`,
+          form,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          }
+        );
+      } else {
+        await api.post(
+          "/api/celebrities",
+          form,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          }
+        );
+      }
+
+      setForm({
+        name: "",
+        category: "Bollywood",
+        price: "",
+        image: ""
+      });
+      setEditingId(null);
+      fetchCelebs();
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        "Operation failed (check category & auth)"
+      );
+    }
   };
 
   const edit = c => {
     setEditingId(c._id);
-    setForm(c);
+    setForm({
+      name: c.name,
+      category: c.category,
+      price: c.price,
+      image: c.image
+    });
   };
 
   const del = async id => {
-    if (!window.confirm("Delete celebrity?")) return;
-    await api.delete(`/api/celebrities/${id}`);
-    fetchCelebs();
+    if (!window.confirm("Delete this celebrity?")) return;
+
+    try {
+      await api.delete(`/api/celebrities/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      fetchCelebs();
+    } catch {
+      setError("Delete failed");
+    }
   };
 
   const sorted = [...celebs].sort((a, b) => {
@@ -64,6 +116,9 @@ function AdminCelebs() {
     <div>
       <h3>Manage Celebrities</h3>
 
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {/* SORT */}
       <label>Sort by: </label>
       <select
         value={sortBy}
@@ -77,7 +132,7 @@ function AdminCelebs() {
 
       <hr />
 
-      {/* ADD / EDIT FORM */}
+      {/* FORM */}
       <input
         placeholder="Name"
         value={form.name}
@@ -101,6 +156,7 @@ function AdminCelebs() {
 
       <input
         placeholder="Price"
+        type="number"
         value={form.price}
         onChange={e =>
           setForm({ ...form, price: e.target.value })
@@ -119,15 +175,36 @@ function AdminCelebs() {
         {editingId ? "Update" : "Add"}
       </button>
 
+      {editingId && (
+        <button
+          onClick={() => {
+            setEditingId(null);
+            setForm({
+              name: "",
+              category: "Bollywood",
+              price: "",
+              image: ""
+            });
+          }}
+        >
+          Cancel
+        </button>
+      )}
+
       <hr />
 
+      {/* LIST */}
       {sorted.map(c => (
-        <div key={c._id} style={{ display: "flex", gap: 10 }}>
-          <img src={c.image} width="80" />
+        <div
+          key={c._id}
+          style={{ display: "flex", gap: 10, marginBottom: 10 }}
+        >
+          <img src={resolveImage(c.image)} width="80" />
           <div>
             <h4>{c.name}</h4>
             <p>{c.category}</p>
             <p>₹{c.price}</p>
+
             <button onClick={() => edit(c)}>Edit</button>
             <button
               onClick={() => del(c._id)}
