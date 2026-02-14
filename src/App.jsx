@@ -3,19 +3,29 @@ import Home from "./Home";
 import Login from "./Login";
 import AdminCelebs from "./AdminCelebs";
 import AdminBookings from "./AdminBookings";
-
-const isLoggedIn = () => !!localStorage.getItem("token");
-
-const Private = ({ children }) =>
-  isLoggedIn() ? children : <Navigate to="/admin/login" />;
+import AdminLayout from "./AdminLayout";
+import PrivateRoute from "./PrivateRoute";
 
 export default function App() {
   return (
     <Routes>
+      {/* PUBLIC */}
       <Route path="/" element={<Home />} />
       <Route path="/admin/login" element={<Login />} />
-      <Route path="/admin/celebs" element={<Private><AdminCelebs /></Private>} />
-      <Route path="/admin/bookings" element={<Private><AdminBookings /></Private>} />
+
+      {/* ADMIN */}
+      <Route
+        path="/admin"
+        element={
+          <PrivateRoute>
+            <AdminLayout />
+          </PrivateRoute>
+        }
+      >
+        <Route index element={<Navigate to="celebs" replace />} />
+        <Route path="celebs" element={<AdminCelebs />} />
+        <Route path="bookings" element={<AdminBookings />} />
+      </Route>
     </Routes>
   );
 }

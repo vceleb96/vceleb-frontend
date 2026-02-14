@@ -1,10 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "./api";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const login = async () => {
     try {
@@ -15,17 +19,24 @@ function Login() {
         return;
       }
 
+      setLoading(true);
+
       const res = await api.post("/api/auth/login", {
         email,
         password
       });
 
+      // save token
       localStorage.setItem("token", res.data.token);
 
-      window.location.href = "/admin/celebs";
+      // redirect to admin dashboard
+      navigate("/admin");
     } catch (err) {
-      setError("Invalid login");
-      console.error(err);
+      setError(
+        err.response?.data?.message || "Invalid email or password"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,7 +60,9 @@ function Login() {
           onChange={e => setPassword(e.target.value)}
         />
 
-        <button onClick={login}>Login</button>
+        <button onClick={login} disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </div>
     </div>
   );
