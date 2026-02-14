@@ -3,32 +3,24 @@ import api from "./api";
 
 function AdminBookings() {
   const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchBookings();
   }, []);
 
   const fetchBookings = async () => {
-    try {
-      const res = await api.get("/api/bookings");
-      setBookings(res.data);
-    } catch (err) {
-      console.error("Failed to fetch bookings", err);
-    } finally {
-      setLoading(false);
-    }
+    const res = await api.get("/api/bookings");
+    setBookings(res.data);
   };
 
-  if (loading) {
-    return <p>Loading bookings...</p>;
-  }
+  const updateStatus = async (id, status) => {
+    await api.put(`/api/bookings/${id}/status`, { status });
+    fetchBookings();
+  };
 
   return (
     <div>
       <h3>Bookings</h3>
-
-      {bookings.length === 0 && <p>No bookings yet</p>}
 
       {bookings.map(b => (
         <div
@@ -39,18 +31,22 @@ function AdminBookings() {
             marginBottom: 10
           }}
         >
-          <p>
-            <strong>Name:</strong> {b.name}
-          </p>
-          <p>
-            <strong>Email:</strong> {b.email}
-          </p>
-          <p>
-            <strong>Celebrity:</strong> {b.celebrity}
-          </p>
-          <p>
-            <strong>Message:</strong> {b.message}
-          </p>
+          <p><strong>Name:</strong> {b.name}</p>
+          <p><strong>Email:</strong> {b.email}</p>
+          <p><strong>Celebrity:</strong> {b.celebrity}</p>
+          <p><strong>Message:</strong> {b.message}</p>
+          <p><strong>Status:</strong> {b.status}</p>
+
+          <select
+            value={b.status}
+            onChange={e =>
+              updateStatus(b._id, e.target.value)
+            }
+          >
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
         </div>
       ))}
     </div>

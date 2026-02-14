@@ -7,17 +7,21 @@ import CATEGORIES from "./constants/categories";
 export default function Home() {
   const [celebs, setCelebs] = useState([]);
   const [category, setCategory] = useState("all");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    api.get("/api/celebrities").then(res => {
-      setCelebs(res.data);
-    });
+    api.get("/api/celebrities").then(res => setCelebs(res.data));
   }, []);
 
-  const filtered =
-    category === "all"
-      ? celebs
-      : celebs.filter(c => c.category === category);
+  const filtered = celebs.filter(c => {
+    const matchesCategory =
+      category === "all" || c.category === category;
+    const matchesSearch = c.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="container">
@@ -29,20 +33,26 @@ export default function Home() {
 
       <h1>Available Celebrities</h1>
 
-      <div style={{ marginBottom: 20 }}>
-        <label>Filter by category: </label>
-        <select
-          value={category}
-          onChange={e => setCategory(e.target.value)}
-        >
-          <option value="all">ALL</option>
-          {CATEGORIES.map(cat => (
-            <option key={cat} value={cat}>
-              {cat.toUpperCase()}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* SEARCH */}
+      <input
+        placeholder="Search celebrity"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        style={{ marginBottom: 10 }}
+      />
+
+      {/* CATEGORY FILTER */}
+      <select
+        value={category}
+        onChange={e => setCategory(e.target.value)}
+      >
+        <option value="all">ALL</option>
+        {CATEGORIES.map(cat => (
+          <option key={cat} value={cat}>
+            {cat}
+          </option>
+        ))}
+      </select>
 
       {filtered.map(c => (
         <div className="card" key={c._id}>
